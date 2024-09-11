@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -41,10 +43,12 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class StudyTest {
 
   @Nested
   @DisplayName("기초")
+  @Order(1)
   class BasicTest {
 
     /**
@@ -126,6 +130,7 @@ class StudyTest {
 
   @Nested
   @DisplayName("특정 시간 안에 실행이 완료되는지 확인")
+  @Order(2)
   class TimeoutTest {
 
     @Test
@@ -154,6 +159,7 @@ class StudyTest {
 
   @Nested
   @DisplayName("실제 값이 기대한 값과 같은지 확인")
+  @Order(3)
   class EqualsTest {
 
     @Test
@@ -179,6 +185,7 @@ class StudyTest {
 
   @Nested
   @DisplayName("조건에 따라 테스트 실행하기")
+  @Order(4)
   class ConditionTest {
 
     @Test
@@ -231,6 +238,7 @@ class StudyTest {
 
   @Nested
   @DisplayName("태깅")
+  @Order(5)
   class TaggingTest {
 
     /**
@@ -254,6 +262,7 @@ class StudyTest {
 
   @Nested
   @DisplayName("커스텀 태깅")
+  @Order(6)
   class CustomTagTest {
 
     /**
@@ -278,6 +287,7 @@ class StudyTest {
 
   @Nested
   @DisplayName("테스트 반복하기")
+  @Order(7)
   class RepeatTest {
 
     @DisplayName("@RepeatedTest - 같은 테스트를 반복하는 경우")
@@ -359,6 +369,7 @@ class StudyTest {
 
   @Nested
   @DisplayName("테스트 인스턴스")
+  @Order(8)
   class InstanceTest {
 
     @Nested
@@ -407,6 +418,7 @@ class StudyTest {
 
   @Nested
   @DisplayName("테스트 순서")
+  @Order(9)
   @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
   class OrderTest {
 

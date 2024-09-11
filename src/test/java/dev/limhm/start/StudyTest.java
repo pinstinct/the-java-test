@@ -14,12 +14,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class StudyTest {
@@ -249,5 +253,24 @@ class StudyTest {
       System.out.println("slow tag");
     }
 
+  }
+
+  @Nested
+  @DisplayName("테스트 반복하기")
+  class RepeatTest {
+
+    @DisplayName("@RepeatedTest - 같은 테스트를 반복하는 경우")
+    @RepeatedTest(value = 10, name = "10번 반복 테스트, {currentRepetition}/{totalRepetitions}")
+    void test1(RepetitionInfo info) {
+      System.out.println("test " + info.getCurrentRepetition() + "/" + info.getTotalRepetitions());
+    }
+
+
+    @DisplayName("@ParameterizedTest - 다른 값으로 테스트를 반복하는 경우")
+    @ParameterizedTest(name = "{index} message={0}")
+    @ValueSource(strings = {"날씨가", "빨리", "좋아져라"})
+    void test2(String message) {
+      System.out.println(message);
+    }
   }
 }

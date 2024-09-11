@@ -1,5 +1,8 @@
 package dev.limhm.start;
 
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumingThat;
+
 import java.time.Duration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -12,6 +15,10 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class StudyTest {
@@ -146,4 +153,53 @@ class StudyTest {
     }
   }
 
+  @Nested
+  @DisplayName("조건에 따라 테스트 실행하기")
+  class ConditionTest {
+
+    @Test
+    @DisplayName("assumeTrue()")
+    void test1() {
+      String env = System.getenv("TEST_ENV");
+      System.out.println("=== " + env);
+      assumeTrue("LOCAL".equalsIgnoreCase(env));
+
+      // TEST_ENV 가 LOCAL 이 아니기 때문에, 실행 안됨
+      Study study = new Study(1);
+      Assertions.assertTrue(study.getLimit() > 0);
+    }
+
+    @Test
+    @DisplayName("assumingThat")
+    void test2() {
+      String env = System.getenv("TEST_ENV");
+      assumingThat("LOCAL".equals(env), () -> {
+        // 로컬 환경에서 테스트 할 코드
+      });
+      assumingThat("PRD".equals(env), () -> {
+        // 운영 환경에서 테스트 할 코드
+      });
+    }
+
+    @Test
+    @DisplayName("")
+    @EnabledIfEnvironmentVariable(named = "TEST_ENV", matches = "LOCAL")
+    void test5() {
+      System.out.println("환경변수 TEST_ENV가 LOCAL이면 테스트 실행");
+    }
+
+    @Test
+    @DisplayName("@DisabledOnOs")
+    @DisabledOnOs({OS.MAC, OS.LINUX})
+    void test3() {
+      System.out.println("mac에서 테스트 실행 안함");
+    }
+
+    @Test
+    @DisplayName("@EnabledOnOs")
+    @EnabledOnOs(OS.MAC)
+    void test4() {
+      System.out.println("mac에서 테스트 실행");
+    }
+  }
 }

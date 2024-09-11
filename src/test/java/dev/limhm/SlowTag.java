@@ -1,4 +1,4 @@
-package dev.limhm.start;
+package dev.limhm;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @Test
-@Tag("fast")
-public @interface FastTag {
+@Tag("slow")
+public @interface SlowTag {
 
 }

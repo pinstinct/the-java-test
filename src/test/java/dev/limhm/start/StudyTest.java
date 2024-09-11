@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assumptions.assumingThat;
 
 import dev.limhm.CustomFindSlowTestExtension;
+import dev.limhm.FastTag;
 import dev.limhm.FindSlowTestExtension;
+import dev.limhm.SlowTag;
 import java.time.Duration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;

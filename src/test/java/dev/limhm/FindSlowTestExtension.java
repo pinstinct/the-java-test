@@ -1,6 +1,5 @@
 package dev.limhm;
 
-import dev.limhm.start.SlowTag;
 import java.lang.reflect.Method;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;

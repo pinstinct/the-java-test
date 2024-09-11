@@ -1,5 +1,7 @@
 package dev.limhm.start;
 
+import dev.limhm.study.StudyStatus;
+
 public class Study {
 
   private StudyStatus status = StudyStatus.DRAFT;

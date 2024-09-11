@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -182,7 +183,7 @@ class StudyTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("@EnabledIfEnvironmentVariable")
     @EnabledIfEnvironmentVariable(named = "TEST_ENV", matches = "LOCAL")
     void test5() {
       System.out.println("환경변수 TEST_ENV가 LOCAL이면 테스트 실행");
@@ -200,6 +201,29 @@ class StudyTest {
     @EnabledOnOs(OS.MAC)
     void test4() {
       System.out.println("mac에서 테스트 실행");
+    }
+  }
+
+  @Nested
+  @DisplayName("태깅")
+  class TaggingTest {
+
+    /**
+     * 태깅 설정 후, tag에 따라 모아 실행하는 법은 IDE에 설정하거나 maven/gradle의 실행툴의 명령을 사용해야 한다.
+     */
+
+    @Test
+    @DisplayName("tag1")
+    @Tag("fast")
+    void test1() {
+      System.out.println("fast tag");
+    }
+
+    @Test
+    @DisplayName("tag2")
+    @Tag("slow")
+    void test2() {
+      System.out.println("slow tag");
     }
   }
 }

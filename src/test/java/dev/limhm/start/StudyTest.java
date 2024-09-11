@@ -22,7 +22,17 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.aggregator.AggregateWith;
+import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregationException;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregator;
+import org.junit.jupiter.params.converter.ArgumentConversionException;
+import org.junit.jupiter.params.converter.ConvertWith;
+import org.junit.jupiter.params.converter.SimpleArgumentConverter;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -265,12 +275,74 @@ class StudyTest {
       System.out.println("test " + info.getCurrentRepetition() + "/" + info.getTotalRepetitions());
     }
 
-
+    @Nested
     @DisplayName("@ParameterizedTest - 다른 값으로 테스트를 반복하는 경우")
-    @ParameterizedTest(name = "{index} message={0}")
-    @ValueSource(strings = {"날씨가", "빨리", "좋아져라"})
-    void test2(String message) {
-      System.out.println(message);
+    class Parameterized {
+
+      @DisplayName("@ValueSource")
+      @ParameterizedTest(name = "{index} {displayName} message={0}")
+      @ValueSource(strings = {"날씨가", "빨리", "좋아져라"})
+      void test2(String message) {
+        System.out.println(message);
+      }
+
+      @DisplayName("명시적인 타입 변환")
+      @ParameterizedTest(name = "{index} {displayName} message={0}")
+      @ValueSource(ints = {10, 20, 40})
+      void test4(@ConvertWith(StudyConverter.class) Study study) {
+        System.out.println(study.getLimit());
+      }
+
+      static class StudyConverter extends SimpleArgumentConverter {
+
+        @Override
+        protected Object convert(Object source, Class<?> targetType) throws ArgumentConversionException {
+          Assertions.assertEquals(Study.class, targetType, "Can only convert to Study");
+          return new Study(Integer.parseInt(source.toString()));
+        }
+      }
+
+      @DisplayName("@NullAndEmptySource")
+      @ParameterizedTest(name = "{index} {displayName} message={0}")
+      @ValueSource(strings = {"날씨가", "빨리", "좋아져라"})
+      // @NullSource + EmptySource
+      @NullAndEmptySource
+      void test3(String message) {
+        System.out.println(message);
+      }
+
+      @DisplayName("@CsvSource")
+      @ParameterizedTest(name = "{index} {displayName} message={0}")
+      @CsvSource({"10, '자바 스터디'", "20, '스프링 스터디'"})
+      void test5(Integer limit, String name) {
+        System.out.println(new Study(limit, name));
+      }
+
+      @DisplayName("ArgumentsAccessor - 인자 값 조합")
+      @ParameterizedTest(name = "{index} {displayName} message={0}")
+      @CsvSource({"10, '자바 스터디'", "20, '스프링 스터디'"})
+      void test6(ArgumentsAccessor accessor) {
+        Study study = new Study(accessor.getInteger(0), accessor.getString(1));
+        System.out.println(study);
+      }
+
+      @DisplayName("커스텀 Accessor")
+      @ParameterizedTest(name = "{index} {displayName} message={0}")
+      @CsvSource({"10, '자바 스터디'", "20, '스프링 스터디'"})
+      void test7(@AggregateWith(StudyAggregator.class) Study study) {
+        System.out.println(study);
+      }
+
+      // static 또는 public 클래스로 구현해야 한다.
+      static class StudyAggregator implements ArgumentsAggregator {
+
+        @Override
+        public Object aggregateArguments(ArgumentsAccessor argumentsAccessor,
+            ParameterContext parameterContext) throws ArgumentsAggregationException {
+          return new Study(argumentsAccessor.getInteger(0), argumentsAccessor.getString(1));
+        }
+      }
+
     }
   }
 }

@@ -38,78 +38,85 @@ import org.junit.jupiter.params.provider.ValueSource;
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class StudyTest {
 
-  /**
-   * 반드시 static 메서드 private 불가, default 가능함. return 타입이 있으면 안됨
-   */
-  @BeforeAll
-  static void beforeAll() {
-    System.out.println("before all");
-  }
+  @Nested
+  @DisplayName("기초")
+  class BasicTest {
 
-  @AfterAll
-  static void afterAll() {
-    System.out.println("after all");
-  }
+    /**
+     * beforeAll(), afterAll() 반드시 static 메서드 /
+     * private 불가, default 가능함 /
+     * return 타입이 있으면 안됨
+     */
+    @BeforeAll
+    static void beforeAll() {
+      System.out.println("before all");
+    }
 
-  @BeforeEach
-  void beforeEach() {
-    System.out.println("before each");
-  }
+    @AfterAll
+    static void afterAll() {
+      System.out.println("after all");
+    }
 
-  @AfterEach
-  void afterEach() {
-    System.out.println("after each");
-  }
+    @BeforeEach
+    void beforeEach() {
+      System.out.println("before each");
+    }
 
-  @Test
-  @DisplayName("스터디 만들기 \uD83D\uDE31")
-  void create_new_study() {
-    Study study = new Study(1);
-    System.out.println("create");
-    Assertions.assertNotNull(study);
-  }
+    @AfterEach
+    void afterEach() {
+      System.out.println("after each");
+    }
 
-  @Test
-  @Disabled
-  void create1() {
-    System.out.println("create 1");
-  }
+    @Test
+    @DisplayName("스터디 만들기 \uD83D\uDE31")
+    void create_new_study() {
+      Study study = new Study(1);
+      System.out.println("create");
+      Assertions.assertNotNull(study);
+    }
 
-  @Test
-  void create_new_study_again() {
-    System.out.println("create 1");
-  }
+    @Test
+    @Disabled
+    void create1() {
+      System.out.println("create 1");
+    }
 
-  @Test
-  @DisplayName("조건이 참인지 확인")
-  void test1() {
-    Study study = new Study(2);
-    Assertions.assertTrue(study.getLimit() > 0,
-        "스터디 최대 참석 인원은 0보다 커야 한다.");
-  }
+    @Test
+    void create_new_study_again() {
+      System.out.println("create 1");
+    }
 
-  @Test
-  @DisplayName("여러개의 assert 문이 있는 경우, 모두 구문 확인")
-  void test2() {
-    Study study = new Study(3);
+    @Test
+    @DisplayName("조건이 참인지 확인")
+    void test1() {
+      Study study = new Study(2);
+      Assertions.assertTrue(study.getLimit() > 0,
+          "스터디 최대 참석 인원은 0보다 커야 한다.");
+    }
 
-    // 첫 번째 assert 문이 깨지면 뒤에 테스틑 실행되지 않지만,
-    // assertAll() 을 사용하면, 모두 실행해 결과 확인 가능
-    Assertions.assertAll(
-        () -> Assertions.assertTrue(study.getLimit() < 0),
-        () -> Assertions.assertNull(study),
-        () -> Assertions.assertEquals(StudyStatus.DRAFT, study.getStatus(),
-            () -> "스터디를 처음 만들면 " + StudyStatus.DRAFT + " 상태다.")
-    );
-  }
+    @Test
+    @DisplayName("여러개의 assert 문이 있는 경우, 모두 구문 확인")
+    void test2() {
+      Study study = new Study(3);
 
-  @Test
-  @DisplayName("예외 발생 확인")
-  void test3() {
-    IllegalArgumentException exception = Assertions.assertThrows(
-        IllegalArgumentException.class, () -> new Study(-10));
-    String message = exception.getMessage();
-    Assertions.assertEquals("limit은 0보다 커야 한다.", message);
+      // 첫 번째 assert 문이 깨지면 뒤에 테스틑 실행되지 않지만,
+      // assertAll() 을 사용하면, 모두 실행해 결과 확인 가능
+      Assertions.assertAll(
+          () -> Assertions.assertTrue(study.getLimit() < 0),
+          () -> Assertions.assertNull(study),
+          () -> Assertions.assertEquals(StudyStatus.DRAFT, study.getStatus(),
+              () -> "스터디를 처음 만들면 " + StudyStatus.DRAFT + " 상태다.")
+      );
+    }
+
+    @Test
+    @DisplayName("예외 발생 확인")
+    void test3() {
+      IllegalArgumentException exception = Assertions.assertThrows(
+          IllegalArgumentException.class, () -> new Study(-10));
+      String message = exception.getMessage();
+      Assertions.assertEquals("limit은 0보다 커야 한다.", message);
+    }
   }
 
   @Nested
@@ -125,17 +132,14 @@ class StudyTest {
       });
     }
 
+    /**
+     * assertTimeoutPreemptively() 사용시, 주의해서 사용할 것. 코드 블록을 별도의 스레드에서 실행하기 때문이다. ThreadLocal 을 사용하는
+     * 코드가 있다면, 예상치 못한 결과 발생한다. 예를 들어 spring transaction 처리는 ThreadLocal 이 기본 전략인데, ThreadLocal은 공유가
+     * 안된다. 때문에 테스트 시, 제대로 동작하지 않아 롤백이 안될 수 있다.
+     */
     @Test
     @DisplayName("테스트 설정 시간이 지나면 바로 종료")
     void test2() {
-      /* *
-       * 주의해서 사용할 것
-       * 코드 블록을 별도의 스레드에서 실행하기 때문이다.
-       *
-       * ThreadLocal 을 사용하는 코드가 있다면, 예상치 못한 결과 발생
-       * 예를 들어 spring transaction 처리는 ThreadLocal 이 기본 전략인데,
-       * ThreadLocal 은 공유가 안된다. 때문에 테스트 시, 제대로 동작하지 않아 롤백이 안될 수 있다.
-       * */
       Assertions.assertTimeoutPreemptively(Duration.ofMillis(100), () -> {
         new Study(10);
         Thread.sleep(300);
@@ -157,7 +161,7 @@ class StudyTest {
 
     /**
      * test1과 test2의 차이 message 대신 messageSupplier 를 넘겨주면, 람다식을 이용할 수 있다. 장점은 문자열에 변수가 있을 때, 연산을 최대한
-     * 지연해준다. 테스트가 실패하는 경우만 연산하게 된다. 성능에 유리하다. (위에 message 는 테스트 실패/성공 상관없이 무조건 연산)
+     * 지연해준다. 테스트가 실패하는 경우만 연산하게 되어 성능에 유리하다. (위에 message 는 테스트 실패/성공 상관없이 무조건 연산)
      */
     @Test
     @DisplayName("assertEquals(expected, actual, messageSupplier)")
@@ -190,9 +194,11 @@ class StudyTest {
       String env = System.getenv("TEST_ENV");
       assumingThat("LOCAL".equals(env), () -> {
         // 로컬 환경에서 테스트 할 코드
+        System.out.println("로컬 실행 코드");
       });
       assumingThat("PRD".equals(env), () -> {
         // 운영 환경에서 테스트 할 코드
+        System.out.println("운영 실행 코드");
       });
     }
 
@@ -223,7 +229,7 @@ class StudyTest {
   class TaggingTest {
 
     /**
-     * 태깅 설정 후, tag에 따라 모아 실행하는 법은 IDE에 설정하거나 maven/gradle의 실행툴의 명령을 사용해야 한다.
+     * 태깅 설정 후, tag에 따라 모아 실행하는 법은 IDE에 설정하거나 maven/gradle 등의 툴 명령을 사용해야 한다.
      */
 
     @Test

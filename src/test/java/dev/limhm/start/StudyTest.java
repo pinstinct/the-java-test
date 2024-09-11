@@ -226,4 +226,28 @@ class StudyTest {
       System.out.println("slow tag");
     }
   }
+
+  @Nested
+  @DisplayName("커스텀 태깅")
+  class CustomTagTest {
+
+    /**
+     * 커스텀 태그를 사용하면 타입 안정성을 지키는데 도움이 된다. (문자열은 오타가 나기 쉽기 때문에)
+     */
+
+    @Test
+    @DisplayName("tag1")
+    @FastTag
+    void test1() {
+      System.out.println("fast tag");
+    }
+
+    @Test
+    @DisplayName("tag2")
+    @SlowTag
+    void test2() {
+      System.out.println("slow tag");
+    }
+
+  }
 }

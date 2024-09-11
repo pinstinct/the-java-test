@@ -18,6 +18,8 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -349,6 +351,54 @@ class StudyTest {
         }
       }
 
+    }
+  }
+
+  @Nested
+  @DisplayName("테스트 인스턴스")
+  class InstanceTest {
+
+    @Nested
+    @DisplayName("인스턴스 기본 전략 - 메소드마다 새로운 인스턴스 실행")
+    class Default {
+
+      int value = 1;
+
+      @Test
+      @DisplayName("인스턴스 1")
+      void test1() {
+        System.out.println(this);
+        System.out.println(value++);
+      }
+
+      @Test
+      @DisplayName("인스턴스 2")
+      void test2() {
+        System.out.println(this);
+        System.out.println(value++);
+      }
+    }
+
+    @Nested
+    @DisplayName("인스턴스 생명 주기 설정")
+    @TestInstance(Lifecycle.PER_CLASS)
+    class MyInstance {
+
+      int value = 1;
+
+      @Test
+      @DisplayName("같은 인스턴스")
+      void test1() {
+        System.out.println(this);
+        System.out.println(value++);
+      }
+
+      @Test
+      @DisplayName("같은 인스턴스")
+      void test2() {
+        System.out.println(this);
+        System.out.println(value++);
+      }
     }
   }
 }

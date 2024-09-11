@@ -13,13 +13,16 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -399,6 +402,26 @@ class StudyTest {
         System.out.println(this);
         System.out.println(value++);
       }
+    }
+  }
+
+  @Nested
+  @DisplayName("테스트 순서")
+  @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+  class OrderTest {
+
+    @Test
+    @DisplayName("첫번째 순서")
+    @Order(1)
+    void test1() {
+      System.out.println("첫번째 순서");
+    }
+
+    @Test
+    @DisplayName("두번째 순서")
+    @Order(2)
+    void test2() {
+      System.out.println("두번째 순서");
     }
   }
 }

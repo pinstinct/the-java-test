@@ -3,6 +3,8 @@ package dev.limhm.start;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assumptions.assumingThat;
 
+import dev.limhm.CustomFindSlowTestExtension;
+import dev.limhm.FindSlowTestExtension;
 import java.time.Duration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -29,7 +31,9 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.AggregateWith;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
@@ -434,6 +438,65 @@ class StudyTest {
     @Order(2)
     void test2() {
       System.out.println("두번째 순서");
+    }
+  }
+
+  @Nested
+  @DisplayName("확장 모델")
+  @Order(10)
+  class ExtensionTest {
+
+    /**
+     * 확장 모델 사용 예: 테스트 실행 조건, 테스트 인스턴스 팩토리, 테스트 인스턴스 후처리기, 테스트 매개변스 리졸버, 테스트 라이프사이클 콜백, ...
+     */
+
+    @Nested
+    @DisplayName("선언적 등록 방식")
+    @ExtendWith(FindSlowTestExtension.class)
+    class DeclarativeTest {
+
+      @Test
+      @DisplayName("느린 테스트이고 @SlowTag 없는 경우")
+      void test1() throws InterruptedException {
+        Thread.sleep(1005L);
+        System.out.println(this);
+      }
+
+      @Test
+      @DisplayName("느린 테스트이고 @SlowTag 있는 경우")
+      @SlowTag
+      void test2() throws InterruptedException {
+        Thread.sleep(1005L);
+        System.out.println(this);
+      }
+    }
+
+    /**
+     * 위의 선언적 방식은 FindSlowTestExtension 인스턴스를 커스터마이징 할 수 없다. 기본 생성자로 만드는 방법밖에 없다. 그렇기 때문에 프로그래밍 등록
+     * 방식을 사용한다.
+     */
+
+    @Nested
+    @DisplayName("프로그래밍 등록 방식")
+    class ProgrammingTest {
+
+      @RegisterExtension
+      static CustomFindSlowTestExtension extension = new CustomFindSlowTestExtension(1000L);
+
+      @Test
+      @DisplayName("느린 테스트이고 @SlowTag 없는 경우")
+      void test1() throws InterruptedException {
+        Thread.sleep(1005L);
+        System.out.println(this);
+      }
+
+      @Test
+      @DisplayName("느린 테스트이고 @SlowTag 있는 경우")
+      @SlowTag
+      void test2() throws InterruptedException {
+        Thread.sleep(1005L);
+        System.out.println(this);
+      }
     }
   }
 }

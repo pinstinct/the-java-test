@@ -21,6 +21,7 @@ import dev.limhm.member.MemberService;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
@@ -35,6 +36,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
@@ -44,6 +47,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -52,6 +56,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class StudyServiceTest {
+
+  // lombok 사용하면, @Slf4j 애너테이션으로 대체 가능
+  static Logger LOGGER = LoggerFactory.getLogger(StudyServiceTest.class);
 
   /**
    * static 으로 생성해야 여러 테스트에서 공유해서 사용 가능하다. 그렇지 않으면 테스트 메소드마다 컨테이너를 새로 띄우기 때문에 느려진다.
@@ -62,6 +69,13 @@ class StudyServiceTest {
 
   @Mock
   StudyRepository studyRepository;
+
+  @BeforeAll
+  static void beforeAll() {
+    // 컨테이너 내의 로그 스트리밍
+    Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(LOGGER);
+    postgreSQLContainer.followOutput(logConsumer);
+  }
 
   @BeforeEach
   void setup() {

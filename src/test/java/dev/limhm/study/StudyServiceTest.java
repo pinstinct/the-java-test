@@ -21,6 +21,7 @@ import dev.limhm.member.MemberService;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -34,14 +35,38 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
+import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@SpringBootTest
+@ActiveProfiles("test")
+@Testcontainers
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class StudyServiceTest {
+
+  /**
+   * static 으로 생성해야 여러 테스트에서 공유해서 사용 가능하다. 그렇지 않으면 테스트 메소드마다 컨테이너를 새로 띄우기 때문에 느려진다.
+   */
+  @Container
+  static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer()
+      .withDatabaseName("studytest");
+
+  @Mock
+  StudyRepository studyRepository;
+
+  @BeforeEach
+  void setup() {
+    studyRepository.deleteAll();
+  }
 
   @Nested
   @DisplayName("Mock 객체 만들기")
@@ -516,7 +541,7 @@ class StudyServiceTest {
     @Mock
     MemberService memberService;
 
-    @Mock
+    @Autowired
     StudyRepository studyRepository;
 
     @Test

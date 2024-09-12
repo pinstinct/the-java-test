@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import dev.limhm.domain.Member;
 import dev.limhm.domain.Study;
 import dev.limhm.member.MemberService;
+import dev.limhm.study.StudyServiceTest.ContainerPropertyInitializer;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -39,13 +40,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
@@ -55,6 +62,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ActiveProfiles("test")
 @Testcontainers
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
+@ContextConfiguration(initializers = ContainerPropertyInitializer.class)
 class StudyServiceTest {
 
   // lombok 사용하면, @Slf4j 애너테이션으로 대체 가능
@@ -70,6 +78,11 @@ class StudyServiceTest {
   @Mock
   StudyRepository studyRepository;
 
+  @Autowired
+  Environment environment;
+
+  @Value("${container.port}") int port;
+
   @BeforeAll
   static void beforeAll() {
     // 컨테이너 내의 로그 스트리밍
@@ -79,7 +92,26 @@ class StudyServiceTest {
 
   @BeforeEach
   void setup() {
+    System.out.println("===*");
+    System.out.println(environment.getProperty("container.port"));
+    // 또는
+    System.out.println(port);
     studyRepository.deleteAll();
+  }
+
+  /**
+   * ApplicationContextInitializer: 스프링 ApplicationContext를 프로그래밍으로 초기화 할 때 사용할 수 있는 콜백 인터페이스로, 특정
+   * 프로파일을 활성화 하거나, 프로퍼티 소스를 추가하는 등의 작업을 할 수 있다.
+   */
+  static class ContainerPropertyInitializer implements
+      ApplicationContextInitializer<ConfigurableApplicationContext> {
+
+    @Override
+    public void initialize(ConfigurableApplicationContext context) {
+      // 테스트용 프로퍼티 소스를 정의할 때 사용
+      TestPropertyValues.of("container.port=" + postgreSQLContainer.getMappedPort(5432))
+          .applyTo(context.getEnvironment());
+    }
   }
 
   @Nested

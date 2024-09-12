@@ -2,6 +2,7 @@ package dev.limhm.study;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -439,7 +440,7 @@ class StudyServiceTest {
   }
 
   @Nested
-  @DisplayName("Moc 객체 확인")
+  @DisplayName("Mock 객체 확인")
   @Order(4)
   @ExtendWith(MockitoExtension.class)
   class MockObject {
@@ -543,6 +544,36 @@ class StudyServiceTest {
       then(memberService).should(times(1)).notify(study);
       then(memberService).should(times(1)).notify(member);
       then(memberService).shouldHaveNoMoreInteractions();
+    }
+  }
+
+  @Nested
+  @DisplayName("Mockito 연습 문제")
+  @Order(6)
+  @ExtendWith(MockitoExtension.class)
+  class MockitoPractice {
+
+    @Test
+    @DisplayName("다른 사용자가 볼 수 있도록 스터디를 공개한다")
+    void openTest(@Mock MemberService memberService, @Mock StudyRepository studyRepository) {
+      // given
+      StudyService studyService = new StudyService(memberService, studyRepository);
+      Study study = new Study(10, "더 자바, 테스트");
+      assertNull(study.getOpenedDateTime());
+
+      // TODO studyRepository Mock 객체의 save 메소드를호출 시 study를 리턴하도록 만들기
+      given(studyRepository.save(study)).willReturn(study);
+
+      // when
+      studyService.opentStudy(study);
+
+      // then
+      // TODO study의 status가 OPENED로 변경됐는지 확인
+      assertEquals(StudyStatus.OPENED, study.getStatus());
+      // TODO study의 openedDataTime이 null이 아닌지 확인
+      assertNotNull(study.getOpenedDateTime());
+      // TODO memberService의 notify(study)가 호출 됐는지 확인
+      then(memberService).should().notify(study);
     }
   }
 }

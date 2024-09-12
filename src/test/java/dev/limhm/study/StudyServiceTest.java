@@ -14,9 +14,14 @@ import dev.limhm.member.MemberService;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestClassOrder;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,15 +31,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class StudyServiceTest {
 
   @Nested
   @DisplayName("Mock 객체 만들기")
+  @Order(1)
   @ExtendWith(MockitoExtension.class)
+  @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
   class MockTest {
 
     @Test
     @DisplayName("인라인으로 인터페이스를 구현해 테스트")
+    @Order(1)
     void implementInterface() {
       MemberService memberService = new MemberService() {
         @Override
@@ -209,6 +218,7 @@ class StudyServiceTest {
 
     @Test
     @DisplayName("Mockito.mock() 메서드로 만드는 방법")
+    @Order(2)
     void usingMock() {
       MemberService memberService = mock(MemberService.class);
       StudyRepository studyRepository = mock(StudyRepository.class);
@@ -224,6 +234,7 @@ class StudyServiceTest {
 
     @Test
     @DisplayName("Mock 애너테이션으로 만드는 방법")
+    @Order(3)
     void usingAnnotation() {
       StudyService studyService = new StudyService(memberService, studyRepository);
       assertNotNull(studyService);
@@ -231,6 +242,7 @@ class StudyServiceTest {
 
     @Test
     @DisplayName("Mock 애너테이션을 메소드에서 사용하는 방법")
+    @Order(4)
     void test1(@Mock MemberService memberService, @Mock StudyRepository studyRepository) {
       StudyService studyService = new StudyService(memberService, studyRepository);
       assertNotNull(studyService);
@@ -240,6 +252,7 @@ class StudyServiceTest {
 
   @Nested
   @DisplayName("Mock 객체 Stubbing")
+  @Order(2)
   @ExtendWith(MockitoExtension.class)
   class MockStubbing {
 
@@ -270,10 +283,12 @@ class StudyServiceTest {
 
     @Nested
     @DisplayName("Mock 객체 조작")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class MockOperation {
 
       @Test
       @DisplayName("특정한 매개변수를 받은 경우 특정한 값을 리턴")
+      @Order(1)
       void test() {
         // 리턴받을 객체
         Member member = new Member();
@@ -290,6 +305,7 @@ class StudyServiceTest {
 
       @Test
       @DisplayName("다른 매개변수를 호출하면 동작하지 않는다")
+      @Order(2)
       void test1() {
         Member member = new Member();
         member.setId(1L);
@@ -310,6 +326,7 @@ class StudyServiceTest {
        */
       @Test
       @DisplayName("매개변수를 범용적으로 작성하는 방법(Argument matchers)")
+      @Order(3)
       void test2() {
         Member member = new Member();
         member.setId(1L);
@@ -323,17 +340,19 @@ class StudyServiceTest {
 
       @Test
       @DisplayName("특정한 매개변수를 받은 경우 예외를 던지는 방법")
+      @Order(4)
       void test3() {
         Member member = new Member();
         member.setId(1L);
         member.setEmail("abc@xyz.com");
 
         when(memberService.findById(1L)).thenThrow(new RuntimeException());
-        assertNotNull(memberService.findById(1L));
+        assertThrows(RuntimeException.class, () -> memberService.findById(1L));
       }
 
       @Test
       @DisplayName("void 메소드의 예외를 던지는 방법")
+      @Order(5)
       void test4() {
         doThrow(new IllegalArgumentException()).when(memberService).validate(1L);
         assertThrows(IllegalArgumentException.class, () -> {
@@ -345,6 +364,7 @@ class StudyServiceTest {
 
       @Test
       @DisplayName("메소드가 동일한 매개변수로 여러번 호출될 될 때 각기 다르게 행동하도록 조작")
+      @Order(6)
       void test5() {
         Member member = new Member();
         member.setId(1L);
@@ -372,11 +392,12 @@ class StudyServiceTest {
 
   @Nested
   @DisplayName("Mock 객체 Stubbing 연습 문제")
+  @Order(3)
   @ExtendWith(MockitoExtension.class)
   class StubbingTest {
 
     @Test
-    @DisplayName("")
+    @DisplayName("연습문제")
     void test(@Mock MemberService memberService, @Mock StudyRepository studyRepository) {
       StudyService studyService = new StudyService(memberService, studyRepository);
       assertNotNull(studyService);

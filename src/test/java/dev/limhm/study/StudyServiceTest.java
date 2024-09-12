@@ -6,6 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import dev.limhm.domain.Member;
@@ -23,7 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestClassOrder;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -53,6 +59,16 @@ class StudyServiceTest {
 
         @Override
         public void validate(Long memberId) {
+
+        }
+
+        @Override
+        public void notify(Study study) {
+
+        }
+
+        @Override
+        public void notify(Member member) {
 
         }
       };
@@ -417,6 +433,74 @@ class StudyServiceTest {
       studyService.createNewStudy(1L, study);
       assertNotNull(study.getOwner());
       assertEquals(member, study.getOwner());
+    }
+  }
+
+  @Nested
+  @DisplayName("Moc 객체 확인")
+  @Order(4)
+  @ExtendWith(MockitoExtension.class)
+  class MockObject {
+
+    @Mock
+    MemberService memberService;
+
+    @Mock
+    StudyRepository studyRepository;
+
+    static Member getMember() {
+      Member member = new Member();
+      member.setId(1L);
+      member.setEmail("abc@xyz.com");
+      return member;
+    }
+
+    static Study getStudy() {
+      return new Study(10, "테스트");
+    }
+
+    /**
+     * @see: <a
+     * href="https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#exact_verification">verify</a>
+     */
+    @Test
+    @DisplayName("특정 메소드가 특정 매개변수로 몇번 호출 됐는지 확인하기")
+    void test() {
+      StudyService studyService = new StudyService(memberService, studyRepository);
+      Member member = getMember();
+      Study study = getStudy();
+
+      when(memberService.findById(1L)).thenReturn(Optional.of(member));
+      when(studyRepository.save(study)).thenReturn(study);
+
+      studyService.createNewStudy(1L, study);
+      assertEquals(member, study.getOwner());
+
+      // memberService 에서 study 라는 매개변수를 가지고 1번 호출 됐는지 검증
+      verify(memberService, times(1)).notify(study);
+      // validate 는 호출 안 됐는지 검증
+      verify(memberService, never()).validate(any());
+    }
+
+    @Test
+    @DisplayName("어떤 순서로 호출됐는지 확인하기")
+    void test1() {
+      StudyService studyService = new StudyService(memberService, studyRepository);
+      Member member = getMember();
+      Study study = getStudy();
+
+      when(memberService.findById(1L)).thenReturn(Optional.of(member));
+      when(studyRepository.save(study)).thenReturn(study);
+
+      studyService.createNewStudy(1L, study);
+      assertEquals(member, study.getOwner());
+
+      // notify(study) 호출 후, notify(member) 가 호출 됐는지 검증
+      InOrder inOrder = Mockito.inOrder(memberService);
+      inOrder.verify(memberService).notify(study);
+      inOrder.verify(memberService).notify(member);
+
+      verifyNoMoreInteractions(memberService);
     }
   }
 }

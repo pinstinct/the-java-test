@@ -16,6 +16,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.3'
     testImplementation "org.testcontainers:junit-jupiter:1.20.1"
     testImplementation "org.testcontainers:postgresql:1.20.1"
+    // Chaos Engineering at Netflix
+    implementation 'de.codecentric:chaos-monkey-spring-boot:3.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:3.3.3'
 }
 
 test {

@@ -1,6 +1,5 @@
 package dev.limhm.domain;
 
-import dev.limhm.study.StudyStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;

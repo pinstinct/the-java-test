@@ -1,6 +1,6 @@
 package dev.limhm.start;
 
-import dev.limhm.study.StudyStatus;
+import dev.limhm.domain.StudyStatus;
 
 public class Study {
 

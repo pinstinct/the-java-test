@@ -7,7 +7,7 @@ import dev.limhm.CustomFindSlowTestExtension;
 import dev.limhm.FastTag;
 import dev.limhm.FindSlowTestExtension;
 import dev.limhm.SlowTag;
-import dev.limhm.study.StudyStatus;
+import dev.limhm.domain.StudyStatus;
 import java.time.Duration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;

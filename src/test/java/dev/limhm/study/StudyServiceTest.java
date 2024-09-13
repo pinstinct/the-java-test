@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 import dev.limhm.domain.Member;
 import dev.limhm.domain.Study;
+import dev.limhm.domain.StudyStatus;
 import dev.limhm.member.MemberService;
 import dev.limhm.study.StudyServiceTest.ContainerPropertyInitializer;
 import java.util.List;
